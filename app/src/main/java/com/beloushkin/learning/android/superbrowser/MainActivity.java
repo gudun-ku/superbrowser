@@ -1,6 +1,8 @@
 package com.beloushkin.learning.android.superbrowser;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,6 +22,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    @BindView(R.id.mySwipeRefreshLayout)
+    SwipeRefreshLayout mSwipeLayout;
     @BindView(R.id.myProgressBar)
     ProgressBar mProgressBar;
     @BindView(R.id.myImageView)
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     WebView mWebView;
     @BindView(R.id.myLinearLayout)
     LinearLayout mLinearLayout;
+
+    String currentUrl;
 
 
     private Toast mToast;
@@ -62,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 mLinearLayout.setVisibility(View.GONE);
+                mSwipeLayout.setRefreshing(false);
                 super.onPageFinished(view, url);
+                currentUrl = url;
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -82,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
             public void onReceivedIcon(WebView view, Bitmap icon) {
                 super.onReceivedIcon(view, icon);
                 mImageView.setImageBitmap(icon);
+            }
+        });
+
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mWebView.reload();
             }
         });
     }
@@ -105,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_refresh:
                 mWebView.reload();
                 break;
+            case R.id.menu_share:
+                shareUrl(currentUrl);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -116,6 +134,15 @@ public class MainActivity extends AppCompatActivity {
             showMessage("Can't go further!");
         }
 
+    }
+
+    private void shareUrl(String url) {
+        if (url.isEmpty()) return;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, currentUrl);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Copied URL...");
+        startActivity(Intent.createChooser(shareIntent, "Share url with somebody..."));
     }
 
     @Override
