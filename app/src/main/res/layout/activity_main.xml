@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/myLinearLayout"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:layout_height="30dp">

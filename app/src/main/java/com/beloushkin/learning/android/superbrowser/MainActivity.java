@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -24,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     ImageView mImageView;
     @BindView(R.id.myWebView)
     WebView mWebView;
+    @BindView(R.id.myLinearLayout)
+    LinearLayout mLinearLayout;
+
 
     private Toast mToast;
 
@@ -46,7 +51,20 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView.loadUrl("https://www.google.com");
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                mLinearLayout.setVisibility(View.VISIBLE);
+                super.onPageStarted(view, url, favicon);
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                mLinearLayout.setVisibility(View.GONE);
+                super.onPageFinished(view, url);
+            }
+        });
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
